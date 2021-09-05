@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/image/unit">
+        <file>steve/steve.png</file>
+        <file>steve/steve_attack.gif</file>
+        <file>steve/steve_walk.gif</file>
+        <file>creeper/creeper.png</file>
+        <file>creeper/creeper_explode.gif</file>
+        <file>creeper/creeper_walk.gif</file>
+        <file>golem/golem.png</file>
+        <file>golem/golem_attack.gif</file>
+        <file>golem/golem_walk.gif</file>
+        <file>zombie/zombie.png</file>
+        <file>zombie/zombie_attack.gif</file>
+        <file>zombie/zombie_walk.gif</file>
+    </qresource>
+</RCC>

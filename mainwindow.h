@@ -3,6 +3,7 @@
 
 #include "gameview.h"
 #include "gamescene.h"
+#include "gamemain.h"
 
 #include <QMainWindow>
 #include <QGraphicsView>
@@ -22,7 +23,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QGraphicsView *gameView;
-    QGraphicsScene *s;
+    GameView *m_gameView;
+    GameMain *m_game;
 };
 #endif // MAINWINDOW_H

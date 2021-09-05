@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/image/block">
+        <file>lava/lava_still.gif</file>
+        <file>dirt/dirt.png</file>
+    </qresource>
+</RCC>
