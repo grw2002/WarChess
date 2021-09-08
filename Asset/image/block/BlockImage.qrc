@@ -2,5 +2,11 @@
     <qresource prefix="/image/block">
         <file>lava/lava_still.gif</file>
         <file>dirt/dirt.png</file>
+        <file>grass/grass_block_top.png</file>
+        <file>water/water_still.gif</file>
+        <file>grasspath/grass_path_top.png</file>
+        <file>stone/stone.png</file>
+        <file>ice/ice.png</file>
+        <file>netherportal/nether_portal.gif</file>
     </qresource>
 </RCC>

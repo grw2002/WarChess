@@ -1,32 +1,129 @@
 #include "unit.h"
+#include "gameui.h"
+#include "image.h"
+#include "gamemain.h"
+#include "unitcontroller.h"
 
 const QTransform Unit::sm_transLeft(1,0,0,0,1,0,0,0,1);
 const QTransform Unit::sm_transRight(-1,0,0,0,1,0,0,0,1);
 
 Unit::Unit(QGraphicsItem *parent) :
     GameItem(parent),
+    m_status(Hold),
     m_direct(Left),
-    m_status(Hold)
+    m_itemUI(nullptr),
+    m_facingRight(false),
+    m_bUnitMoveMenu(false),
+    m_unitMoveMenu(nullptr)
 {
     setDirect(Right);
+    setAcceptHoverEvents(true);
+    this->setFlag(QGraphicsItem::ItemIsSelectable);
+    setZValue(300);
 }
 
+Unit::~Unit() {
+    if(m_itemUI!=nullptr) {
+        delete m_itemUI;
+    }
+    if(m_bUnitMoveMenu) {
+        delete m_unitMoveMenu;
+    }
+}
+
+void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                   QWidget *widget) {
+    image()->paint(painter,option,widget,m_facingRight);
+    painter->setPen(Qt::red);
+    painter->drawRect(boundingRect());
+}
+
+void Unit::setDirect(Direct newDirect) {
+    m_direct=newDirect;
+    if(newDirect==Left) {
+        setTransform(sm_transLeft);
+//            m_facingRight=false;
+    }
+    if(newDirect==Right) {
+        setTransform(sm_transRight);
+//            m_facingRight=true;
+    }
+}
+
+void Unit::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
+    if(m_itemUI == nullptr) {
+        m_itemUI=new UnitStatus(this);
+        m_itemUI->setPos(pos()+(event->pos()*transform()));
+        scene()->addItem(m_itemUI);
+    }
+    GameItem::hoverEnterEvent(event);
+}
+
+void Unit::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+    m_itemUI->setPos(pos()+(event->pos()*transform()));
+    GameItem::hoverMoveEvent(event);
+}
+
+void Unit::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    if(m_itemUI) {
+        scene()->removeItem(m_itemUI);
+        m_itemUI=nullptr;
+    }
+    GameItem::hoverLeaveEvent(event);
+}
+
+void Unit::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+    if(m_itemUI) {
+        m_itemUI->setPos(pos()+(event->pos()*transform()));
+    }
+    GameItem::mouseMoveEvent(event);
+}
+
+void Unit::onClick(QGraphicsSceneMouseEvent *event) {
+    qDebug()<<"unit click";
+    Q_UNUSED(event);
+    if(m_bUnitMoveMenu) {
+        scene()->removeItem(m_unitMoveMenu);
+        m_unitMoveMenu=nullptr;
+        m_bUnitMoveMenu=false;
+    } else {
+        auto dests=UnitController::SPFA(m_game, this);
+        m_unitMoveMenu=new UnitMove(this, dests);
+        m_unitMoveMenu->setPos(QPointF(0,0));
+        scene()->addItem(m_unitMoveMenu);
+        m_bUnitMoveMenu=true;
+        connect(m_unitMoveMenu,SIGNAL(DestSelected(QPoint)),this,SLOT(onDestSelect(QPoint)));
+    }
+}
+
+void Unit::onDestSelect(QPoint dest) {
+    qDebug()<<"dest "<<dest;
+    scene()->removeItem(m_unitMoveMenu);
+    m_unitMoveMenu=nullptr;
+    m_bUnitMoveMenu=false;
+    UnitController::StartMoveAction(m_game,this,dest);
+//    auto res=UnitController::FindRoute(m_game,this,dest);
+}
+
+//
 // Steve
+//
 
 std::unordered_map<Unit::Status, Image*> Steve::sm_images;
 
-Unit::UnitType Steve::unitType() const {
+Steve::UnitType Steve::unitType() const {
     return Unit::Steve;
 }
 
-Unit::PlayerType Steve::playerType() const {
+Steve::PlayerType Steve::playerType() const {
     return Unit::Player;
 }
 
 Steve::Steve(QGraphicsItem *parent):
-    Unit(parent)
+    Unit(parent),
+    m_image(Steve::sm_images[m_status]),
+    m_ability({3,10,5})
 {
-    m_image=Steve::sm_images[m_status];
     connect(Steve::sm_images[Walk],SIGNAL(frameChanged(int)),this,SLOT(onFrameChange(int)));
     connect(Steve::sm_images[Attack],SIGNAL(frameChanged(int)),this,SLOT(onFrameChange(int)));
 }
@@ -37,18 +134,18 @@ Steve::~Steve()
 }
 
 const Image* Steve::image() const {
-    return m_image;
+    return sm_images[status()];
 }
 
 // Golem
 
 std::unordered_map<Unit::Status, Image*> Golem::sm_images;
 
-Unit::UnitType Golem::unitType() const {
+Golem::UnitType Golem::unitType() const {
     return Unit::Golem;
 }
 
-Unit::PlayerType Golem::playerType() const {
+Golem::PlayerType Golem::playerType() const {
     return Unit::Player;
 }
 
@@ -73,11 +170,11 @@ const Image* Golem::image() const {
 
 std::unordered_map<Unit::Status, Image*> Zombie::sm_images;
 
-Unit::UnitType Zombie::unitType() const {
+Zombie::UnitType Zombie::unitType() const {
     return Unit::Zombie;
 }
 
-Unit::PlayerType Zombie::playerType() const {
+Zombie::PlayerType Zombie::playerType() const {
     return Unit::Enemy;
 }
 
@@ -102,11 +199,11 @@ const Image* Zombie::image() const {
 
 std::unordered_map<Unit::Status, Image*> Creeper::sm_images;
 
-Unit::UnitType Creeper::unitType() const {
+Creeper::UnitType Creeper::unitType() const {
     return Unit::Creeper;
 }
 
-Unit::PlayerType Creeper::playerType() const {
+Creeper::PlayerType Creeper::playerType() const {
     return Unit::Enemy;
 }
 

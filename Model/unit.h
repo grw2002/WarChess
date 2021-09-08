@@ -1,16 +1,26 @@
 #ifndef UNIT_H
 #define UNIT_H
 
-#include "image.h"
-#include "gameitem.h"
+#include "GameConfig.h"
 #include "imageinitializer.h"
+#include "gameitem.h"
+#include "gameui.h"
 
 #include <QObject>
 #include <QDebug>
 #include <QTransform>
 #include <unordered_map>
+#include <QGraphicsSceneHoverEvent>
 
 class GameMain;
+class UnitController;
+class Move;
+
+struct Ability {
+    int hp;
+    int movable;
+    int attack;
+};
 
 class Unit : public GameItem
 {
@@ -46,19 +56,13 @@ public:
 
     explicit Unit(QGraphicsItem *parent = nullptr);
 
+    virtual ~Unit();
+
     virtual UnitType unitType() const = 0;
 
     virtual PlayerType playerType() const = 0;
 
-    virtual void setDirect(Direct newDirect) {
-        m_direct=newDirect;
-        if(newDirect==Left) {
-            setTransform(sm_transLeft);
-        }
-        if(newDirect==Right) {
-            setTransform(sm_transRight);
-        }
-    }
+    virtual void setDirect(Direct newDirect);
 
     virtual Direct direct() const {
         return m_direct;
@@ -68,11 +72,39 @@ public:
         return m_status;
     }
 
-public:
-    Direct m_direct;
+    virtual Ability ability() const = 0;
+
+public slots:
+    void onDestSelect(QPoint dest);
+
+protected:
+    virtual void onClick(QGraphicsSceneMouseEvent *event) override;
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget) override;
+
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+
+    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+
+protected:
     Status m_status;
-    int m_hp, m_level;
+    Direct m_direct;
+
+
+private:
+    GameUI *m_itemUI;
+    bool m_facingRight;
     const static QTransform sm_transLeft, sm_transRight;
+    bool m_bUnitMoveMenu;
+    GameUI *m_unitMoveMenu;
+    friend class UnitController;
+    friend class Move;
+    friend void UnitStatus::onClick(QGraphicsSceneMouseEvent *event);
 };
 
 // Steve
@@ -89,27 +121,14 @@ public:
 
     PlayerType playerType() const override;
 
-    static std::unordered_map<Status, Image*> sm_images;
-
-protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override{
-        Q_UNUSED(event);
-        switch (m_status) {
-        case Hold:
-            m_status=Walk;
-            break;
-        case Walk:
-            m_status=Attack;
-            break;
-        case Attack:
-            m_status=Hold;
-            break;
-        }
-        m_image=sm_images[m_status];
+    Ability ability() const override {
+        return m_ability;
     }
 
 private:
+    static std::unordered_map<Status, Image*> sm_images;
     const Image* m_image;
+    Ability m_ability;
     const Image* image() const override;
     friend void ImageInitializer::ImageInitial();
 };
@@ -128,11 +147,8 @@ public:
 
     PlayerType playerType() const override;
 
-    static std::unordered_map<Status, Image*> sm_images;
-
 protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override{
-        Q_UNUSED(event);
+    virtual void onClick(QGraphicsSceneMouseEvent *event) override {
         switch (m_status) {
         case Hold:
             m_status=Walk;
@@ -145,9 +161,11 @@ protected:
             break;
         }
         m_image=sm_images[m_status];
+        Unit::onClick(event);
     }
 
 private:
+    static std::unordered_map<Status, Image*> sm_images;
     const Image* m_image;
     const Image* image() const override;
     friend void ImageInitializer::ImageInitial();
@@ -167,11 +185,8 @@ public:
 
     PlayerType playerType() const override;
 
-    static std::unordered_map<Status, Image*> sm_images;
-
 protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override{
-        Q_UNUSED(event);
+    virtual void onClick(QGraphicsSceneMouseEvent *event) override {
         switch (m_status) {
         case Hold:
             m_status=Walk;
@@ -184,9 +199,11 @@ protected:
             break;
         }
         m_image=sm_images[m_status];
+        Unit::onClick(event);
     }
 
 private:
+    static std::unordered_map<Status, Image*> sm_images;
     const Image* m_image;
     const Image* image() const override;
     friend void ImageInitializer::ImageInitial();
@@ -206,11 +223,8 @@ public:
 
     PlayerType playerType() const override;
 
-    static std::unordered_map<Status, Image*> sm_images;
-
 protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override{
-        Q_UNUSED(event);
+    virtual void onClick(QGraphicsSceneMouseEvent *event) override {
         switch (m_status) {
         case Hold:
             m_status=Walk;
@@ -223,9 +237,11 @@ protected:
             break;
         }
         m_image=sm_images[m_status];
+        Unit::onClick(event);
     }
 
 private:
+    static std::unordered_map<Status, Image*> sm_images;
     const Image* m_image;
     const Image* image() const override;
     friend void ImageInitializer::ImageInitial();

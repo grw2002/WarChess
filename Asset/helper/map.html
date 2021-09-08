@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>地图编辑器</title>
+    <style type="text/css">
+        button {
+            font-weight: 900;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <button @click="parse">parse</button>
+        <input v-model="val" />
+        <table>
+            <tbody>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td v-for="i in (1,33)">{{i}}</td>
+                </tr>
+                <tr v-if="map!==null" v-for="(row,i) in map">
+                    <td>{{i}}</td>
+                    <td v-for="(item,j) in row">
+                        <button @click="inputChange($event,i,j)" :style="{color: colors[item]}">{{item}}</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <textarea style="width: 80%;height:768px;" v-model="map_text"></textarea>
+    </div>
+    <div>
+        <h3>Manual</h3>
+        <p>地图为32*16的方格，玩家区域为x:[1,32]和y:[1,16]，其中x=0、x=33、y=0、y=17部分为不可见区域，起点和终点应该放在这些区域</p>
+        <p>一张地图由block地图和direction地图组成，block地图表示方格种类，direction对于怪物的正常行进非常重要</p>
+        <p>block种类：0-泥土，1-草地，2-石头，3-水域，4-熔岩，5-草径，6-冰块，7-NetherPortal</p>
+        <p>direction种类：上-0，右-1，下-2，左-3</p>
+        <hr />
+        <p>上方网格是可视化编辑，下面是生成的地图json</p>
+        <ul>
+            <li>在网格上编辑时，下方的json区会自动更新，编辑完复制走即可</li>
+            <li>如果要从json向网格解析，需要在粘贴之后点击上方的"parse"按钮</li>
+        </ul>
+        <p>先在parse按钮旁边的文本框里填一个数字，然后点击网格上的按钮，网格内的数字就会变成文本框里的数字</p>
+    </div>
+    <script src="vue.min.js"></script>
+    <script>
+        new Vue({
+            data: {
+                map: null,
+                map_text: null,
+                val: 0,
+                colors: ['goldenrod', 'green', 'grey', 'blue', 'red', 'yellow', 'aliceblue', 'purple']
+            },
+            created: async function () {
+                this.map = {};
+                this.map[0] = {};
+                for (let i = 0; i <= 25; i++) {
+                    this.map[i] = {};
+                    this.map[i][0] = i;
+                    for (j = 0; j <= 33; j++) {
+                        this.map[i][j] = 0;
+                    }
+                }
+                this.convert();
+            },
+            methods: {
+                convert: function () {
+                    let tmp = [];
+                    for (let j = 0; j <= 33; j++) {
+                        let row = [];
+                        for (let i = 0; i <= 25; i++) {
+                            row.push(this.map[i][j]);
+                        }
+                        tmp.push(row);
+                    }
+                    this.map_text = JSON.stringify(tmp, space = 4).replace(/\[/g, '{').replace(/\]/g, '}');
+                },
+                inputChange: function (e, i, j) {
+                    this.map[i][j] = Number(this.val);
+                    this.convert();
+                },
+                parse: function () {
+                    let tmp = JSON.parse(this.map_text.replace(/{/g, '[').replace(/}/g, ']'));
+                    let newMap = {};
+                    for (let i = 0; i <= 33; i++) {
+                        for (let j = 0; j <= 25; j++) {
+                            newMap[j] = newMap[j] || {};
+                            newMap[j][i] = tmp[i][j];
+                        }
+                    }
+                    this.map = newMap;
+                }
+            }
+        }).$mount('#app');
+    </script>
+</body>
+
+</html>

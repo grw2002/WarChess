@@ -1,15 +1,12 @@
 #ifndef GAMEMAIN_H
 #define GAMEMAIN_H
 
+#include "GameConfig.h"
+
 #include <QObject>
 #include <vector>
 
-//#include "GameConfig.h"
-
-#include "level.h"
-#include "unit.h"
-#include "action.h"
-#include "uielement.h"
+class UnitController;
 
 enum GameStatus {
     Start=0,
@@ -26,16 +23,21 @@ public:
     explicit GameMain(GameView *gameview=nullptr, QObject *parent = nullptr);
     GameScene* scene()const;
 
+public slots:
+    void onActionFinish();
+
 signals:
 
 private:
     Level *m_pLevel;
     std::vector<Unit*> m_units;
-    std::vector<UIElement> m_uiElements;
+//    std::vector<UIElement> m_uiElements;
     GameStatus m_status;
     bool m_bAction;
     Action *m_pCurrentAction;
     GameScene *m_scene;
+
+    friend class UnitController;
 };
 
 

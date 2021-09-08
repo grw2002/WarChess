@@ -1,4 +1,5 @@
 #include "gameitem.h"
+#include "image.h"
 #include <QGraphicsItem>
 
 GameItem::GameItem(QGraphicsItem *parent):

@@ -1,6 +1,9 @@
 #include "imageinitializer.h"
 #include "unit.h"
 #include "gamemap.h"
+#include "gameui.h"
+#include "action.h"
+#include "image.h"
 
 void ImageInitializer::ImageInitial() {
     Steve::sm_images[Unit::Hold]=new Image(":/image/unit/steve/steve.png",BLOCK_SIZE,BLOCK_SIZE*2,false,QPoint(HALF_BLOCK_SIZE,BLOCK_SIZE+HALF_BLOCK_SIZE));
@@ -20,5 +23,15 @@ void ImageInitializer::ImageInitial() {
     Creeper::sm_images[Unit::Attack]=new Image(":/image/unit/creeper/creeper_explode.gif",BLOCK_SIZE,BLOCK_SIZE*2,true,QPoint(HALF_BLOCK_SIZE,BLOCK_SIZE+HALF_BLOCK_SIZE));
 
     Dirt::m_image=new Image(":/image/block/dirt/dirt.png",BLOCK_SIZE,BLOCK_SIZE,false,QPoint(HALF_BLOCK_SIZE,HALF_BLOCK_SIZE));
+    Grass::m_image=new Image(":/image/block/grass/grass_block_top.png",BLOCK_SIZE,BLOCK_SIZE,false,QPoint(HALF_BLOCK_SIZE,HALF_BLOCK_SIZE));
+    Stone::m_image=new Image(":/image/block/stone/stone.png",BLOCK_SIZE,BLOCK_SIZE,false,QPoint(HALF_BLOCK_SIZE,HALF_BLOCK_SIZE));
+    Water::m_image=new Image(":/image/block/water/water_still.gif",BLOCK_SIZE,BLOCK_SIZE,true,QPoint(HALF_BLOCK_SIZE,HALF_BLOCK_SIZE));
     Lava::m_image=new Image(":/image/block/lava/lava_still.gif",BLOCK_SIZE,BLOCK_SIZE,true,QPoint(HALF_BLOCK_SIZE,HALF_BLOCK_SIZE));
+    GrassPath::m_image=new Image(":/image/block/grasspath/grass_path_top.png",BLOCK_SIZE,BLOCK_SIZE,false,QPoint(HALF_BLOCK_SIZE,HALF_BLOCK_SIZE));
+    Ice::m_image=new Image(":/image/block/ice/ice.png",BLOCK_SIZE,BLOCK_SIZE,false,QPoint(HALF_BLOCK_SIZE,HALF_BLOCK_SIZE));
+    NetherPortal::m_image=new Image(":/image/block/netherportal/nether_portal.gif",BLOCK_SIZE,BLOCK_SIZE,true,QPoint(HALF_BLOCK_SIZE,HALF_BLOCK_SIZE));
+
+    UnitStatus::m_book=new Image(":/image/ui/book/book.png",300,400,false,QPoint(0,0));
+
+    Explosion::m_image=new Image(":/image/item/explosion/explosion.gif",64,64,true,QPoint(32,32));
 }

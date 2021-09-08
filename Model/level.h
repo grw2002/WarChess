@@ -4,20 +4,25 @@
 #include <QObject>
 #include <vector>
 
-#include "gamemap.h"
-#include "unit.h"
+class GameMap;
+class GameScene;
+class Unit;
 
 class Level : public QObject
 {
     Q_OBJECT
 public:
-    explicit Level(QGraphicsScene *scene, QObject *parent = nullptr);
+    explicit Level(GameScene *scene, QObject *parent = nullptr);
+
+    virtual ~Level();
 
 signals:
 
 public:
     GameMap *m_pMap;
-    std::vector<Unit*> m_units;
+//    std::vector<Unit*> m_units;
 };
+
+
 
 #endif // LEVEL_H

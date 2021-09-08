@@ -10,11 +10,13 @@ CONFIG += c++11
 
 SOURCES += \
     Controller/gamemain.cpp \
+    Controller/unitcontroller.cpp \
     GameBase/gameitem.cpp \
     GameBase/gamescene.cpp \
     GameBase/gameview.cpp \
     Model/action.cpp \
     Model/gamemap.cpp \
+    Model/gameui.cpp \
     Model/level.cpp \
     Model/uielement.cpp \
     Model/unit.cpp \
@@ -25,12 +27,14 @@ SOURCES += \
 
 HEADERS += \
     Controller/gamemain.h \
+    Controller/unitcontroller.h \
     GameBase/GameConfig.h \
     GameBase/gameitem.h \
     GameBase/gamescene.h \
     GameBase/gameview.h \
     Model/action.h \
     Model/gamemap.h \
+    Model/gameui.h \
     Model/level.h \
     Model/uielement.h \
     Model/unit.h \
@@ -55,4 +59,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     Asset/image/block/BlockImage.qrc \
+    Asset/image/item/ItemImage.qrc \
+    Asset/image/ui/UIImage.qrc \
     Asset/image/unit/UnitImage.qrc

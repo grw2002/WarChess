@@ -14,11 +14,11 @@ class Image : public QObject
 {
     Q_OBJECT
 public:
-    Image(const QString& path, int width, int height, bool isGif = false, QPoint anchor=QPoint(0,0), QObject *parent = nullptr);
+    Image(const QString& path, int width, int height, bool isGif = false, QPoint anchor=QPoint(0,0), bool horizonMirrored = false,QObject *parent = nullptr);
     virtual ~Image();
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget) const;
+               QWidget *widget, bool horizonMirrored = false) const;
 
 protected slots:
 //    void timerEvent(QTimerEvent *event) override {
@@ -32,6 +32,7 @@ private:
     const int m_width, m_height;
     const QRectF m_bounding;
     const bool m_bGif;
+    const bool m_horizonMirrored;
 
 signals:
     void frameChanged(int);

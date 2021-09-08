@@ -12,9 +12,20 @@
 
 #define FPS 30
 
-#include "gameview.h"
-#include "gamescene.h"
-#include "gameitem.h"
+//#include "gameview.h"
+//#include "gamescene.h"
+//#include "gameitem.h"
+
+class GameView;
+class GameScene;
+class GameItem;
+class GameMain;
+class Image;
+class Unit;
+class Level;
+class Action;
+class GameUI;
+class UnitStatus;
 
 #include <qDebug>
 
