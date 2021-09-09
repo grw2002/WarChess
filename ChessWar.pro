@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     Controller/gamemain.cpp \
+    Controller/mapcontroller.cpp \
     Controller/unitcontroller.cpp \
     GameBase/gameitem.cpp \
     GameBase/gamescene.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 
 HEADERS += \
     Controller/gamemain.h \
+    Controller/mapcontroller.h \
     Controller/unitcontroller.h \
     GameBase/GameConfig.h \
     GameBase/gameitem.h \

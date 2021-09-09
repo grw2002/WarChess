@@ -1,13 +1,7 @@
 #include "gameview.h"
 
-GameView::GameView(QWidget *parent):
-    QGraphicsView(parent)
-{
+GameView::GameView(QWidget *parent) : QGraphicsView(parent) {}
 
-}
+GameView::~GameView() {}
 
-GameView::~GameView(){}
-
-void GameView::wheelEvent(QWheelEvent *event){
-    Q_UNUSED(event);
-}
+void GameView::wheelEvent(QWheelEvent *event) { Q_UNUSED(event); }

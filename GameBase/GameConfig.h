@@ -26,6 +26,12 @@ class Level;
 class Action;
 class GameUI;
 class UnitStatus;
+class Block;
+class GameIcon;
+class GameUI;
+
+class MapController;
+class UnitController;
 
 #include <qDebug>
 

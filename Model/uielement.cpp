@@ -1,6 +1,3 @@
 #include "uielement.h"
 
-UIElement::UIElement(QObject *parent) : QObject(parent)
-{
-
-}
+UIElement::UIElement(QObject *parent) : QObject(parent) {}

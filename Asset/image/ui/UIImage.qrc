@@ -1,5 +1,13 @@
 <RCC>
     <qresource prefix="/image/ui">
         <file>book/book.png</file>
+        <file>background/demo_background.png</file>
+        <file>container/container1.png</file>
+        <file>container/container2.png</file>
+        <file>icon/speed.png</file>
+        <file>icon/strength.png</file>
+        <file>icon/diamond_axe.png</file>
+        <file>icon/iron_sword.png</file>
+        <file>icon/tnt_side.png</file>
     </qresource>
 </RCC>

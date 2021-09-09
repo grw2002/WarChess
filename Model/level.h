@@ -8,21 +8,18 @@ class GameMap;
 class GameScene;
 class Unit;
 
-class Level : public QObject
-{
-    Q_OBJECT
+class Level : public QObject {
+  Q_OBJECT
 public:
-    explicit Level(GameScene *scene, QObject *parent = nullptr);
+  explicit Level(GameScene *scene, QObject *parent = nullptr);
 
-    virtual ~Level();
+  virtual ~Level();
 
 signals:
 
 public:
-    GameMap *m_pMap;
-//    std::vector<Unit*> m_units;
+  GameMap *m_pMap;
+  //    std::vector<Unit*> m_units;
 };
-
-
 
 #endif // LEVEL_H

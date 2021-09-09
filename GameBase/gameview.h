@@ -5,14 +5,14 @@
 #include <QObject>
 #include <QWidget>
 
-class GameView : public QGraphicsView
-{
-    Q_OBJECT
+class GameView : public QGraphicsView {
+  Q_OBJECT
 public:
-    GameView(QWidget *parent = nullptr);
-    virtual ~GameView();
+  GameView(QWidget *parent = nullptr);
+  virtual ~GameView();
+
 protected:
-    virtual void wheelEvent(QWheelEvent *event) override;
+  virtual void wheelEvent(QWheelEvent *event) override;
 };
 
 #endif // GAMEVIEW_H
