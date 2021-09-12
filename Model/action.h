@@ -4,14 +4,19 @@
 #include "GameConfig.h"
 #include "gameitem.h"
 #include "imageinitializer.h"
+#include "soundinitializer.h"
 
 #include <QObject>
 #include <QPropertyAnimation>
+#include <QSoundEffect>
 #include <stack>
 
 
 class Unit;
 
+/**
+ * @brief 所有Action的基类
+ */
 class Action : public QObject {
   Q_OBJECT
 public:
@@ -29,10 +34,15 @@ public:
 
   virtual void start() = 0;
 
+  virtual Unit *unit() const = 0;
+
 signals:
   void actionFinished();
 };
 
+/**
+ * @brief 移动类
+ */
 class Move : public Action {
   Q_OBJECT
 public:
@@ -40,18 +50,37 @@ public:
 
   ~Move();
 
-  ActionType actionType() const override { return Action::Move; }
+  ActionType actionType() const override;
 
-  ActionStatus status() const override { return m_status; }
+  ActionStatus status() const override;
 
+  /**
+   * @brief setTarget 设置目的地
+   * @param target
+   */
   void setTarget(QPoint target);
 
+  /**
+   * @brief setRoute 设置路线
+   * @param route
+   */
   void setRoute(const std::stack<QPoint> &route);
 
   void start() override;
 
+  Unit *unit() const override;
+
 public slots:
+  /**
+   * @brief onAnimationFinish 没走一格就是一次动画，所以对应着一次动画结束
+   */
   void onAnimationFinish();
+
+private:
+  /**
+   * @brief NextAnimation 进行下一步
+   */
+  void NextAnimation();
 
 private:
   Unit *const m_unit;
@@ -59,7 +88,8 @@ private:
   ActionStatus m_status;
   std::stack<QPoint> m_route;
   QPropertyAnimation *m_animation;
-  void NextAnimation();
+  friend class UnitController;
+  friend class GameController;
 };
 
 class Attack : public Action {
@@ -71,15 +101,22 @@ public:
 
   ~Attack();
 
-  ActionType actionType() const override { return Action::Attack; }
+  ActionType actionType() const override;
 
-  ActionStatus status() const override { return m_status; }
+  ActionStatus status() const override;
 
-  AttackType attackType() const { return m_attackType; }
+  AttackType attackType() const;
 
-  void setTarget(Unit *target) { m_target = target; }
+  void setTarget(Unit *target);
 
   void start() override;
+
+  void finish();
+
+  Unit *unit() const override;
+
+public slots:
+  void onAnimationFinish();
 
 protected:
   void timerEvent(QTimerEvent *event) override;
@@ -89,13 +126,25 @@ private:
   const AttackType m_attackType;
   ActionStatus m_status;
   int m_nTimerId;
-  bool m_bAttackBack;
+  int m_nRound;
+  std::vector<Bullet *> m_explosions, m_fires;
+  QPropertyAnimation *m_animation;
+
+  static QSoundEffect *m_tapSound, *m_zombieSound, *m_explosionSound,
+      *m_creeperSound;
+
+  friend class UnitController;
+  friend class GameController;
+  friend class SoundInitializer;
 };
 
+/**
+ * @brief The Bullet class 所有子弹的基类：Explosion或Fire
+ */
 class Bullet : public GameItem {
   Q_OBJECT
 public:
-  enum BulletType { Explosion = 1 };
+  enum BulletType { Explosion = 1, Fire = 2 };
 
   explicit Bullet(QGraphicsItem *parent = nullptr);
 
@@ -111,10 +160,25 @@ public:
 
   ~Explosion();
 
-  BulletType bulletType() const override { return Bullet::Explosion; }
+  BulletType bulletType() const override;
 
 private:
-  static const Image *m_image;
+  static const Image *m_image; // 爆炸动画
+  const Image *image() const override;
+  friend void ImageInitializer::ImageInitial();
+};
+
+class Fire : public Bullet {
+  Q_OBJECT
+public:
+  explicit Fire(QGraphicsItem *parent = nullptr);
+
+  ~Fire();
+
+  BulletType bulletType() const override;
+
+private:
+  static const Image *m_image; // 火球动画
   const Image *image() const override;
   friend void ImageInitializer::ImageInitial();
 };

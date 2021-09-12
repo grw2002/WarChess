@@ -6,22 +6,24 @@
 #include "gameui.h"
 #include "imageinitializer.h"
 
-
 #include <QGraphicsSceneMouseEvent>
 #include <QObject>
 #include <QTransform>
 #include <unordered_map>
 
-
-class GameMain;
-class UnitController;
-class Move;
-
+/**
+ * @brief The Ability struct Unit的属性
+ */
 struct Ability {
   int hp;
   int attack;
   int movable;
+  int detection;
 };
+
+/**
+ * @brief The Unit class 所有Unit的基类
+ */
 
 class Unit : public GameItem {
   Q_OBJECT
@@ -46,24 +48,50 @@ public:
 
   virtual ~Unit();
 
+  /**
+   * @brief unitType Unit种类
+   * @return
+   */
   virtual UnitType unitType() const = 0;
 
+  /**
+   * @brief playerType 玩家/敌方
+   * @return
+   */
   virtual PlayerType playerType() const = 0;
 
+  /**
+   * @brief setDirect 设置方向（上/下/左/右）
+   * @param newDirect
+   */
   virtual void setDirect(Direct newDirect);
 
-  virtual Direct direct() const { return m_direct; }
+  virtual Direct direct() const;
 
-  virtual Status status() const { return m_status; }
+  virtual Status status() const;
 
+  /**
+   * @brief ability 固有的能力
+   * @return
+   */
   virtual const Ability ability() const = 0;
 
-  virtual Ability property() const = 0;
+  /**
+   * @brief property 可能变化的属性（如HP）
+   * @return
+   */
+  virtual Ability &property() = 0;
 
   virtual void setLogicPos(QPoint) override;
 
-public slots:
-  //    void onDestSelect(QPoint dest);
+  /**
+   * @brief resetRoundState 在进入新的回合时清除移动/攻击记录
+   */
+  virtual void resetRoundState();
+
+  virtual bool moved();
+
+  virtual bool attacked();
 
 protected:
   virtual void onClick(QGraphicsSceneMouseEvent *event) override;
@@ -79,31 +107,36 @@ protected:
 
   virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 
-protected slots:
-  //    virtual void onGameUIClose(GameUI* gameui);
-
 protected:
   Status m_status;
   Direct m_direct;
 
 private:
-  GameUI *m_itemUI;
-  bool m_facingRight;
-  const static QTransform sm_transLeft, sm_transRight;
-  bool m_bUnitMoveMenu;
-  GameUI *m_unitMoveMenu, *m_hpBar, *m_unitActionUI, *m_unitAttackMenu;
+  GameUI *m_itemUI;                                    // UnitStatus
+  bool m_facingRight;                                  // 朝向左/右
+  const static QTransform sm_transLeft, sm_transRight; // 朝向变换矩阵
+  bool m_bUnitMoveMenu; // 是否处于Move菜单模式
+  GameUI *m_unitMoveMenu, *m_hpBar, *m_unitActionUI,
+      *m_unitAttackMenu;      // 各种菜单
+  Action *m_action;           // 当前的action
+  bool m_bMoved, m_bAttacked; // 当前回合是否移动/攻击过
+
   friend class UnitController;
+  friend class GameController;
   friend class Move;
   friend class Attack;
+  friend class UnitHP;
   friend void UnitStatus::onClick(QGraphicsSceneMouseEvent *event);
 };
 
-// Steve
+/**
+ * @brief The Steve class
+ */
 
 class Steve : public Unit {
   Q_OBJECT
 public:
-  explicit Steve(QGraphicsItem *parent = nullptr);
+  explicit Steve(Ability initialAbility, QGraphicsItem *parent = nullptr);
 
   ~Steve();
 
@@ -111,25 +144,30 @@ public:
 
   PlayerType playerType() const override;
 
-  const Ability ability() const override { return m_ability; }
+  const Ability ability() const override;
 
-  Ability property() const override { return m_property; }
+  Ability &property() override;
+
+protected:
+  const Image *image() const override;
 
 private:
-  static std::unordered_map<Status, Image *> sm_images;
+  static std::unordered_map<Status, Image *> sm_images; // 状态到图像的映射
   const Image *m_image;
   const struct Ability m_ability;
   struct Ability m_property;
-  const Image *image() const override;
+
   friend void ImageInitializer::ImageInitial();
 };
 
-// Golem
+/**
+ * @brief The Golem class
+ */
 
 class Golem : public Unit {
   Q_OBJECT
 public:
-  explicit Golem(QGraphicsItem *parent = nullptr);
+  explicit Golem(Ability initialAbility, QGraphicsItem *parent = nullptr);
 
   ~Golem();
 
@@ -137,42 +175,30 @@ public:
 
   PlayerType playerType() const override;
 
-  const Ability ability() const override { return m_ability; }
+  const Ability ability() const override;
 
-  Ability property() const override { return m_property; }
+  Ability &property() override;
 
 protected:
-  //    virtual void onClick(QGraphicsSceneMouseEvent *event) override {
-  //        switch (m_status) {
-  //        case Hold:
-  //            m_status=Walk;
-  //            break;
-  //        case Walk:
-  //            m_status=Attack;
-  //            break;
-  //        case Attack:
-  //            m_status=Hold;
-  //            break;
-  //        }
-  //        m_image=sm_images[m_status];
-  //        Unit::onClick(event);
-  //    }
+  const Image *image() const override;
 
 private:
-  static std::unordered_map<Status, Image *> sm_images;
+  static std::unordered_map<Status, Image *> sm_images; // 状态到图像的映射
   const Image *m_image;
   const struct Ability m_ability;
   struct Ability m_property;
-  const Image *image() const override;
+
   friend void ImageInitializer::ImageInitial();
 };
 
-// Zombie
+/**
+ * @brief The Zombie class
+ */
 
 class Zombie : public Unit {
   Q_OBJECT
 public:
-  explicit Zombie(QGraphicsItem *parent = nullptr);
+  explicit Zombie(Ability initialAbility, QGraphicsItem *parent = nullptr);
 
   ~Zombie();
 
@@ -180,42 +206,30 @@ public:
 
   PlayerType playerType() const override;
 
-  const Ability ability() const override { return m_ability; }
+  const Ability ability() const override;
 
-  Ability property() const override { return m_property; }
+  Ability &property() override;
 
 protected:
-  //    virtual void onClick(QGraphicsSceneMouseEvent *event) override {
-  //        switch (m_status) {
-  //        case Hold:
-  //            m_status=Walk;
-  //            break;
-  //        case Walk:
-  //            m_status=Attack;
-  //            break;
-  //        case Attack:
-  //            m_status=Hold;
-  //            break;
-  //        }
-  //        m_image=sm_images[m_status];
-  //        Unit::onClick(event);
-  //    }
+  const Image *image() const override;
 
 private:
-  static std::unordered_map<Status, Image *> sm_images;
+  static std::unordered_map<Status, Image *> sm_images; // 状态到图像的映射
   const Image *m_image;
   const struct Ability m_ability;
   struct Ability m_property;
-  const Image *image() const override;
+
   friend void ImageInitializer::ImageInitial();
 };
 
-// Creeper
+/**
+ * @brief The Creeper class
+ */
 
 class Creeper : public Unit {
   Q_OBJECT
 public:
-  explicit Creeper(QGraphicsItem *parent = nullptr);
+  explicit Creeper(Ability initialAbility, QGraphicsItem *parent = nullptr);
 
   ~Creeper();
 
@@ -223,33 +237,48 @@ public:
 
   PlayerType playerType() const override;
 
-  const Ability ability() const override { return m_ability; }
+  const Ability ability() const override;
 
-  Ability property() const override { return m_property; }
+  Ability &property() override;
 
 protected:
-  //    virtual void onClick(QGraphicsSceneMouseEvent *event) override {
-  //        switch (m_status) {
-  //        case Hold:
-  //            m_status=Walk;
-  //            break;
-  //        case Walk:
-  //            m_status=Attack;
-  //            break;
-  //        case Attack:
-  //            m_status=Hold;
-  //            break;
-  //        }
-  //        m_image=sm_images[m_status];
-  //        Unit::onClick(event);
-  //    }
+  const Image *image() const override;
 
 private:
-  static std::unordered_map<Status, Image *> sm_images;
+  static std::unordered_map<Status, Image *> sm_images; // 状态到图像的映射
   const Image *m_image;
   const struct Ability m_ability;
   struct Ability m_property;
+  friend void ImageInitializer::ImageInitial();
+};
+
+/**
+ * @brief The Villager class
+ */
+
+class Villager : public Unit {
+  Q_OBJECT
+public:
+  explicit Villager(Ability initialAbility, QGraphicsItem *parent = nullptr);
+
+  ~Villager();
+
+  UnitType unitType() const override;
+
+  PlayerType playerType() const override;
+
+  const Ability ability() const override { return m_ability; }
+
+  Ability &property() override { return m_property; }
+
+protected:
   const Image *image() const override;
+
+private:
+  static std::unordered_map<Status, Image *> sm_images; // 状态到图像的映射
+  const Image *m_image;
+  const struct Ability m_ability;
+  struct Ability m_property;
   friend void ImageInitializer::ImageInitial();
 };
 

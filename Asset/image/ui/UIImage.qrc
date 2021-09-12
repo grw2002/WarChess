@@ -9,5 +9,7 @@
         <file>icon/diamond_axe.png</file>
         <file>icon/iron_sword.png</file>
         <file>icon/tnt_side.png</file>
+        <file>icon/starticon.png</file>
+        <file>logo/village_pillage.png</file>
     </qresource>
 </RCC>

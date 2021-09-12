@@ -1,8 +1,13 @@
 #include "gameitem.h"
+#include "gamecontroller.h"
 #include "gamemain.h"
 #include "gameui.h"
 #include "image.h"
+
+
 #include <QGraphicsItem>
+#include <QGraphicsSceneMouseEvent>
+#include <QMessageBox>
 
 
 GameItem::GameItem(QGraphicsItem *parent)
@@ -31,7 +36,6 @@ void GameItem::onFrameChange(int frameNumber) {
 }
 
 void GameItem::onClick(QGraphicsSceneMouseEvent *event) {
-  qDebug() << "base onclick" << event->pos();
   event->setPos(event->scenePos());
   if (m_game->m_pOverlayUI) {
     switch (m_game->m_pOverlayUI->uiType()) {
@@ -44,9 +48,35 @@ void GameItem::onClick(QGraphicsSceneMouseEvent *event) {
     case GameUI::UnitAttack:
       ((UnitAttack *)(m_game->m_pOverlayUI))->onClick(event);
       break;
+    case GameUI::Icon:
+      ((GameIcon *)(m_game->m_pOverlayUI))->onClick(event);
+      break;
     default:
       break;
     }
+    return;
   }
-  Q_UNUSED(event);
+  if (event->button() == Qt::RightButton) {
+    if (m_game->status() == GameMain::Self && !m_game->actioning()) {
+      if (QMessageBox::question(nullptr, "提示", "结束当前回合吗") ==
+          QMessageBox::Yes) {
+        GameController::nextRound(m_game, GameMain::Enemy);
+      }
+    }
+  }
+}
+
+void GameItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+  m_bClickValid = true;
+  QGraphicsItem::mousePressEvent(event);
+}
+
+void GameItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+  m_bClickValid = false;
+  QGraphicsItem::mouseMoveEvent(event);
+}
+
+void GameItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+  onClick(event);
+  QGraphicsItem::mouseReleaseEvent(event);
 }

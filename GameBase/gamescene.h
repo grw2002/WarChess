@@ -3,34 +3,30 @@
 
 #include "GameConfig.h"
 
-#include <QEvent>
 #include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
 #include <QObject>
 
-
+/**
+ * @brief 继承的游戏场景
+ */
 class GameScene : public QGraphicsScene {
   Q_OBJECT
 public:
   GameScene(GameMain *game, QObject *parent = nullptr);
+
   virtual ~GameScene();
+
+  /**
+   * @brief addItem 重写addItem函数，注入m_game参数
+   * @param item
+   */
   void addItem(GameItem *item);
 
-  virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-    m_pressPos = mouseEvent->screenPos();
-    //        QGraphicsScene::mousePressEvent(mouseEvent);
-  }
+  // 下面两个函数配合GameItem实现了友好的点击事件
 
-  //    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-  //        qDebug()<<"scene move";
-  //    }
+  virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
 
-  virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-    if (m_pressPos == mouseEvent->screenPos()) {
-      QGraphicsScene::mousePressEvent(mouseEvent);
-    }
-    //        QGraphicsScene::mouseReleaseEvent(mouseEvent);
-  }
+  virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
 
 private:
   GameMain *m_game;

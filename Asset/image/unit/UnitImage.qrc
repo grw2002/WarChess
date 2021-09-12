@@ -12,5 +12,7 @@
         <file>zombie/zombie.png</file>
         <file>zombie/zombie_attack.gif</file>
         <file>zombie/zombie_walk.gif</file>
+        <file>villager/villager.png</file>
+        <file>villager/villager_walk.gif</file>
     </qresource>
 </RCC>

@@ -1,8 +1,10 @@
 #include "imageinitializer.h"
 #include "action.h"
+#include "gamemain.h"
 #include "gamemap.h"
 #include "gameui.h"
 #include "image.h"
+#include "level.h"
 #include "unit.h"
 
 
@@ -37,6 +39,13 @@ void ImageInitializer::ImageInitial() {
   Zombie::sm_images[Unit::Attack] =
       new Image(":/image/unit/zombie/zombie_attack.gif", BLOCK_SIZE * 1.6,
                 BLOCK_SIZE * 3.2, true, QPoint(BLOCK_SIZE, BLOCK_SIZE * 2.3));
+
+  Villager::sm_images[Unit::Hold] = new Image(
+      ":/image/unit/villager/villager.png", BLOCK_SIZE, BLOCK_SIZE * 2, false,
+      QPoint(HALF_BLOCK_SIZE, BLOCK_SIZE + HALF_BLOCK_SIZE));
+  Villager::sm_images[Unit::Walk] = new Image(
+      ":/image/unit/villager/villager_walk.gif", BLOCK_SIZE, BLOCK_SIZE * 2,
+      true, QPoint(HALF_BLOCK_SIZE, BLOCK_SIZE + HALF_BLOCK_SIZE));
 
   Creeper::sm_images[Unit::Hold] =
       new Image(":/image/unit/creeper/creeper.png", BLOCK_SIZE, BLOCK_SIZE * 2,
@@ -73,10 +82,12 @@ void ImageInitializer::ImageInitial() {
                 BLOCK_SIZE, true, QPoint(HALF_BLOCK_SIZE, HALF_BLOCK_SIZE));
 
   UnitStatus::m_book =
-      new Image(":/image/ui/book/book.png", 300, 400, false, QPoint(0, 0));
+      new Image(":/image/ui/book/book.png", 420, 300, false, QPoint(0, 0));
 
   Explosion::m_image = new Image(":/image/item/explosion/explosion.gif", 64, 64,
                                  true, QPoint(32, 32));
+  Fire::m_image =
+      new Image(":/image/item/fire/fire.gif", 64, 64, true, QPoint(32, 32));
 
   UnitActionMenu::sm_backgroundImage =
       new Image(":/image/ui/background/demo_background.png", 176, 128, false,
@@ -95,4 +106,10 @@ void ImageInitializer::ImageInitial() {
       ":/image/ui/container/container1.png", 64, 64, false, QPoint(0, 0));
   GameIcon::sm_containerImage2 = new Image(
       ":/image/ui/container/container2.png", 64, 64, false, QPoint(0, 0));
+
+  StartScreen::sm_starticon =
+      new Image(":/image/ui/icon/starticon.png", 48, 48, false, QPoint(-8, -8));
+
+  Logo::sm_logo = new Image(":/image/ui/logo/village_pillage.png", 1024, 128,
+                            false, QPoint(512, 64));
 }

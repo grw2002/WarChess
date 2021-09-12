@@ -1,6 +1,15 @@
 #include "image.h"
 
-#include "GameConfig.h"
+/**
+ * @brief Image
+ * @param path 路径
+ * @param width 宽度
+ * @param height 高度
+ * @param isGif 是否是gif
+ * @param anchor 锚点
+ * @param horizonMirrored 水平镜像
+ * @param parent
+ */
 
 Image::Image(const QString &path, int width, int height, bool isGif,
              QPoint anchor, bool horizonMirrored, QObject *parent)
@@ -29,7 +38,20 @@ Image::~Image() {
   }
 }
 
+/**
+ * @brief boundingRect 同QGraphicsItem::boundingRect，直接传参即可
+ * @return
+ */
+
 QRectF Image::boundingRect() const { return m_bounding; }
+
+/**
+ * @brief paint 同QGraphicsItem::paint，直接传参即可
+ * @param painter
+ * @param option
+ * @param widget
+ * @param horizonMirrored
+ */
 
 void Image::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                   QWidget *widget, bool horizonMirrored) const {

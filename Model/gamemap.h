@@ -5,23 +5,91 @@
 #include "gameitem.h"
 #include "imageinitializer.h"
 
-
 #include <QObject>
 
+/**
+ * @brief The GameMap class 所有地图的基类
+ */
 class GameMap : public QObject {
   Q_OBJECT
 public:
   explicit GameMap(GameScene *scene, QObject *parent = nullptr);
-  Block **operator[](int x) { return m_pBlocks[x]; }
 
-  Block *operator[](QPoint p) { return (*this)[p.x()][p.y()]; }
+  virtual ~GameMap();
 
-signals:
+  /**
+   * @brief operator [] 通过下标返回对应Block
+   * @param x
+   * @return
+   */
+  Block **operator[](int x);
+
+  /**
+   * @brief operator [] 通过logicPos返回对应Block
+   * @param p
+   * @return
+   */
+  Block *operator[](QPoint p);
+
+protected:
+  GameScene *m_pScene;
+  /**
+   * @brief initialMap 依据二维数组初始化地图
+   * @param map
+   */
+  void initialMap(const int map[][NUMY + 2]);
 
 private:
   Block *m_pBlocks[NUMX + 2][NUMY + 2];
 };
 
+/**
+ * @brief The EncounterMap class 遭遇战地图
+ */
+
+class EncounterMap : public GameMap {
+  Q_OBJECT
+public:
+  explicit EncounterMap(GameScene *scene, QObject *parent = nullptr);
+
+  ~EncounterMap();
+
+private:
+  static const int map[NUMX + 2][NUMY + 2];
+};
+
+/**
+ * @brief The AssaultMap class 村庄保卫战地图
+ */
+class AssaultMap : public GameMap {
+  Q_OBJECT
+public:
+  explicit AssaultMap(GameScene *scene, QObject *parent = nullptr);
+
+  ~AssaultMap();
+
+private:
+  static const int map[NUMX + 2][NUMY + 2];
+};
+
+/**
+ * @brief The DefaultMap class 开始界面和结束界面的默认地图
+ */
+
+class DefaultMap : public GameMap {
+  Q_OBJECT
+public:
+  explicit DefaultMap(GameScene *scene, QObject *parent = nullptr);
+
+  ~DefaultMap();
+
+private:
+  int map[NUMX + 2][NUMY + 2];
+};
+
+/**
+ * @brief The Block class 所有网格的基类
+ */
 class Block : public GameItem {
   Q_OBJECT
 public:
@@ -36,31 +104,55 @@ public:
     NetherPortal = 7
   };
 
-  explicit Block(QGraphicsItem *parent = nullptr) : GameItem(parent) {
-    setZValue(100);
-  }
+  explicit Block(QGraphicsItem *parent = nullptr);
 
+  /**
+   * @brief paint 重载绘图函数，处理网格不可见的情况
+   * @param painter
+   * @param option
+   * @param widget
+   */
   virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                      QWidget *widget) override;
 
   virtual BlockType blockType() const = 0;
 
-  bool occupation() const { return m_bOccupied; }
+  /**
+   * @brief occupation 此方格是否被占用
+   * @return
+   */
+  bool occupation() const;
 
-  void setOccupation(bool occupied) { m_bOccupied = occupied; }
+  /**
+   * @brief setOccupation 更改占用情况
+   * @param occupied
+   */
+  void setOccupation(bool occupied);
 
-  Unit *unit() const { return m_unit; }
+  /**
+   * @brief unit 如果占用，返回占用的单位
+   * @return
+   */
+  Unit *unit() const;
 
 protected slots:
+  /**
+   * @brief onframeChange 如果地图是动态的gif，需要实时update()以更新
+   * @param frameCount
+   */
   void onframeChange(int frameCount);
 
 private:
-  bool m_bOccupied;
-  Unit *m_unit;
+  bool m_bOccupied; //是否被占用
+  bool m_bVisible;  //是否可见（战争迷雾）
+  Unit *m_unit;     //方格上面的单位
   friend class MapController;
+  friend class UnitController;
 };
 
-// Dirt
+/**
+ * @brief The Dirt class
+ */
 
 class Dirt : public Block {
   Q_OBJECT
@@ -81,7 +173,9 @@ private:
   friend void ImageInitializer::ImageInitial();
 };
 
-// Grass
+/**
+ * @brief The Grass class
+ */
 
 class Grass : public Block {
   Q_OBJECT
@@ -102,7 +196,9 @@ public:
   friend void ImageInitializer::ImageInitial();
 };
 
-// Stone
+/**
+ * @brief The Stone class
+ */
 
 class Stone : public Block {
   Q_OBJECT
@@ -123,7 +219,9 @@ public:
   friend void ImageInitializer::ImageInitial();
 };
 
-// Water
+/**
+ * @brief The Water class
+ */
 
 class Water : public Block {
   Q_OBJECT
@@ -144,7 +242,9 @@ public:
   friend void ImageInitializer::ImageInitial();
 };
 
-// Lava
+/**
+ * @brief The Lava class
+ */
 
 class Lava : public Block {
   Q_OBJECT
@@ -165,7 +265,9 @@ public:
   friend void ImageInitializer::ImageInitial();
 };
 
-// GrassPath
+/**
+ * @brief The GrassPath class
+ */
 
 class GrassPath : public Block {
   Q_OBJECT
@@ -186,7 +288,9 @@ public:
   friend void ImageInitializer::ImageInitial();
 };
 
-// Ice
+/**
+ * @brief The Ice class
+ */
 
 class Ice : public Block {
   Q_OBJECT
@@ -207,7 +311,9 @@ public:
   friend void ImageInitializer::ImageInitial();
 };
 
-// NetherPortal
+/**
+ * @brief The NetherPortal class
+ */
 
 class NetherPortal : public Block {
   Q_OBJECT
